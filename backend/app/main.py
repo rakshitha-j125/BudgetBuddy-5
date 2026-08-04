@@ -1,17 +1,29 @@
-import time
-import logging
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("budgetbuddy")
+from app.database import Base
+from app.database import engine
+from app.routers import profile
 
-app = FastAPI(
-    title="Budget Buddy API",
-    version="1.0.0"
+from app.routers import (
+    auth,
+    income,
+    expense,
+    budget,
+    analytics,
+    reports,
 )
 
+# Create all database tables
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(
+    title="BudgetBuddy API",
+    version="1.0.0",
+    description="Personal Finance Management Backend",
+)
+
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -22,24 +34,51 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.middleware("http")
-async def log_requests(request: Request, call_next):
-    start_time = time.time()
-    response = await call_next(request)
-    duration = round((time.time() - start_time) * 1000, 2)
-    logger.info(f"{request.method} {request.url.path} -> {response.status_code} ({duration}ms)")
-    return response
-
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    logger.error(f"Unhandled error on {request.url.path}: {exc}")
-    return JSONResponse(
-        status_code=500,
-        content={"detail": "Internal server error"}
-    )
-
+# Root Route
 @app.get("/")
-def home():
+def root():
     return {
-        "message": "Welcome to Budget Buddy API"
+        "message": "Welcome to BudgetBuddy API 🚀"
     }
+
+# Routers
+app.include_router(
+    auth.router,
+    prefix="/auth",
+    tags=["Authentication"],
+)
+
+app.include_router(
+    income.router,
+    prefix="/income",
+    tags=["Income"],
+)
+
+app.include_router(
+    expense.router,
+    prefix="/expense",
+    tags=["Expense"],
+)
+
+app.include_router(
+    budget.router,
+    prefix="/budget",
+    tags=["Budget"],
+)
+
+app.include_router(
+    analytics.router,
+    prefix="/analytics",
+    tags=["Analytics"],
+)
+
+app.include_router(
+    reports.router,
+    prefix="/reports",
+    tags=["Reports"],
+)
+app.include_router(
+    profile.router,
+    prefix="/profile",
+    tags=["Profile"],
+)
