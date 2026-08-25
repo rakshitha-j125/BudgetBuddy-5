@@ -1,21 +1,24 @@
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
 class Settings:
-    # ==========================================
-    # Database
-    # ==========================================
+    # =========================
+    # DATABASE
+    # =========================
+
     DATABASE_URL = os.getenv(
         "DATABASE_URL",
         "sqlite:///./budgetbuddy.db"
     )
 
-    # ==========================================
+    # =========================
     # JWT
-    # ==========================================
+    # =========================
+
     SECRET_KEY = os.getenv(
         "SECRET_KEY",
         "change-this-secret-key"
@@ -29,22 +32,59 @@ class Settings:
     ACCESS_TOKEN_EXPIRE_MINUTES = int(
         os.getenv(
             "ACCESS_TOKEN_EXPIRE_MINUTES",
-            60
+            "60"
         )
     )
 
-    # ==========================================
-    # Gmail SMTP
-    # ==========================================
+    # =========================
+    # OTP
+    # =========================
+
+    OTP_LENGTH = int(
+        os.getenv(
+            "OTP_LENGTH",
+            "6"
+        )
+    )
+
+    OTP_EXPIRE_MINUTES = int(
+        os.getenv(
+            "OTP_EXPIRE_MINUTES",
+            "10"
+        )
+    )
+
+    OTP_RESEND_INTERVAL = int(
+        os.getenv(
+            "OTP_RESEND_INTERVAL",
+            "60"
+        )
+    )
+
+    # =========================
+    # PASSWORD RESET
+    # =========================
+
+    RESET_TOKEN_EXPIRE_MINUTES = int(
+        os.getenv(
+            "RESET_TOKEN_EXPIRE_MINUTES",
+            "15"
+        )
+    )
+
+    # =========================
+    # EMAIL / SMTP
+    # =========================
+
     SMTP_HOST = os.getenv(
         "SMTP_HOST",
-        "smtp.gmail.com"
+        ""
     )
 
     SMTP_PORT = int(
         os.getenv(
             "SMTP_PORT",
-            587
+            "587"
         )
     )
 
@@ -68,47 +108,19 @@ class Settings:
         "BudgetBuddy"
     )
 
-    # ==========================================
-    # OTP
-    # ==========================================
-    OTP_LENGTH = int(
-        os.getenv(
-            "OTP_LENGTH",
-            6
-        )
-    )
-
-    OTP_EXPIRE_MINUTES = int(
-        os.getenv(
-            "OTP_EXPIRE_MINUTES",
-            10
-        )
-    )
-
-    OTP_RESEND_INTERVAL = int(
-        os.getenv(
-            "OTP_RESEND_INTERVAL",
-            60
-        )
-    )
-
-    # ==========================================
-    # Password Reset
-    # ==========================================
-    RESET_TOKEN_EXPIRE_MINUTES = int(
-        os.getenv(
-            "RESET_TOKEN_EXPIRE_MINUTES",
-            15
-        )
-    )
-
-    # ==========================================
-    # Frontend
-    # ==========================================
-    FRONTEND_URL = os.getenv(
-        "FRONTEND_URL",
-        "http://localhost:5173"
-    )
-
 
 settings = Settings()
+
+
+# Keep these exports because the existing project imports
+# DATABASE_URL directly in app.database and other files.
+
+DATABASE_URL = settings.DATABASE_URL
+SECRET_KEY = settings.SECRET_KEY
+ALGORITHM = settings.ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
+
+OTP_LENGTH = settings.OTP_LENGTH
+OTP_EXPIRE_MINUTES = settings.OTP_EXPIRE_MINUTES
+OTP_RESEND_INTERVAL = settings.OTP_RESEND_INTERVAL
+RESET_TOKEN_EXPIRE_MINUTES = settings.RESET_TOKEN_EXPIRE_MINUTES

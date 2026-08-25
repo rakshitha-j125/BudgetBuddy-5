@@ -31,14 +31,18 @@ const AuthButton = ({
         active:scale-95
         disabled:cursor-not-allowed
         disabled:opacity-60
+        flex
+        items-center
+        justify-center
+        gap-2
         ${className}
       `}
     >
       {loading ? (
-        <div className="flex items-center justify-center gap-2">
+        <>
           <Loader2 className="h-5 w-5 animate-spin" />
           <span>Please wait...</span>
-        </div>
+        </>
       ) : (
         children
       )}

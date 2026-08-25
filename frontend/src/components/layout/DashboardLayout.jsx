@@ -1,26 +1,18 @@
-import Sidebar from "../components/dashboard/Sidebar";
-import Navbar from "../components/dashboard/Navbar";
+import Sidebar from "../dashboard/Sidebar";
+import Navbar from "../dashboard/Navbar";
 
 const DashboardLayout = ({ children }) => {
   return (
     <div className="flex min-h-screen bg-slate-100">
-
-      {/* Sidebar */}
       <Sidebar />
 
-      {/* Main Content */}
       <div className="flex flex-1 flex-col">
-
-        {/* Top Navbar */}
         <Navbar />
 
-        {/* Page Content */}
-        <main className="flex-1 p-8 overflow-auto">
+        <main className="flex-1 overflow-auto p-8">
           {children}
         </main>
-
       </div>
-
     </div>
   );
 };

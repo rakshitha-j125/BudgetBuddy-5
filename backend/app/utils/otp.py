@@ -62,7 +62,9 @@ def validate_otp(
     if is_otp_expired(expiry_time):
         return False
 
-    return saved_otp == entered_otp
+    return (
+        saved_otp.strip() == entered_otp.strip()
+    )
 
 
 def get_resend_expiry() -> datetime:

@@ -1,9 +1,9 @@
 import {
-  AreaChart,
   Area,
+  AreaChart,
   CartesianGrid,
-  Tooltip,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
@@ -19,44 +19,87 @@ const data = [
 
 export default function IncomeExpenseChart() {
   return (
-    <ResponsiveContainer width="100%" height={320}>
-      <AreaChart data={data}>
-        <defs>
-          <linearGradient id="income" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#22C55E" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#22C55E" stopOpacity={0} />
-          </linearGradient>
+    <div className="rounded-2xl bg-slate-900 p-6 shadow-lg">
+      <h2 className="mb-6 text-xl font-bold text-white">
+        Income vs Expense
+      </h2>
 
-          <linearGradient id="expense" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#EF4444" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#EF4444" stopOpacity={0} />
-          </linearGradient>
-        </defs>
+      <ResponsiveContainer
+        width="100%"
+        height={320}
+      >
+        <AreaChart data={data}>
+          <defs>
+            <linearGradient
+              id="income"
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="1"
+            >
+              <stop
+                offset="5%"
+                stopColor="#22C55E"
+                stopOpacity={0.8}
+              />
+              <stop
+                offset="95%"
+                stopColor="#22C55E"
+                stopOpacity={0}
+              />
+            </linearGradient>
 
-        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <linearGradient
+              id="expense"
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="1"
+            >
+              <stop
+                offset="5%"
+                stopColor="#EF4444"
+                stopOpacity={0.8}
+              />
+              <stop
+                offset="95%"
+                stopColor="#EF4444"
+                stopOpacity={0}
+              />
+            </linearGradient>
+          </defs>
 
-        <XAxis dataKey="month" stroke="#CBD5E1" />
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="#374151"
+          />
 
-        <YAxis stroke="#CBD5E1" />
+          <XAxis
+            dataKey="month"
+            stroke="#CBD5E1"
+          />
 
-        <Tooltip />
+          <YAxis stroke="#CBD5E1" />
 
-        <Area
-          type="monotone"
-          dataKey="income"
-          stroke="#22C55E"
-          fillOpacity={1}
-          fill="url(#income)"
-        />
+          <Tooltip />
 
-        <Area
-          type="monotone"
-          dataKey="expense"
-          stroke="#EF4444"
-          fillOpacity={1}
-          fill="url(#expense)"
-        />
-      </AreaChart>
-    </ResponsiveContainer>
+          <Area
+            type="monotone"
+            dataKey="income"
+            stroke="#22C55E"
+            fillOpacity={1}
+            fill="url(#income)"
+          />
+
+          <Area
+            type="monotone"
+            dataKey="expense"
+            stroke="#EF4444"
+            fillOpacity={1}
+            fill="url(#expense)"
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
   );
 }

@@ -1,12 +1,13 @@
-import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Lock } from "lucide-react";
 
-import AuthInput from "../components/auth/AuthInput";
-import AuthButton from "../components/auth/AuthButton";
-import PasswordStrength from "../components/auth/PasswordStrength";
-import OTPInput from "../components/auth/OTPInput";
 import api from "../api/axios";
+
+import AuthButton from "../components/auth/AuthButton";
+import AuthInput from "../components/auth/AuthInput";
+import OTPInput from "../components/auth/OTPInput";
+import PasswordStrength from "../components/auth/PasswordStrength";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -15,17 +16,25 @@ const ResetPassword = () => {
   const email = location.state?.email || "";
 
   const [otp, setOtp] = useState("");
-
   const [password, setPassword] = useState("");
-
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] =
+    useState("");
 
   const [loading, setLoading] = useState(false);
-
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!otp) {
+      setError("Please enter the OTP.");
+      return;
+    }
+
+    if (!password) {
+      setError("Please enter a new password.");
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
@@ -33,10 +42,11 @@ const ResetPassword = () => {
     }
 
     setLoading(true);
+    setError("");
 
     try {
       await api.post("/auth/reset-password", {
-        email,
+        email: email.trim(),
         otp,
         password,
       });
@@ -53,24 +63,20 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 p-6">
-
+    <div className="flex min-h-screen items-center justify-center bg-slate-100 p-6">
       <div className="w-full max-w-lg rounded-3xl bg-white p-8 shadow-2xl">
-
-        <h1 className="text-3xl font-bold text-center">
+        <h1 className="text-center text-3xl font-bold">
           Reset Password
         </h1>
 
-        <p className="text-center mt-2 text-slate-500">
+        <p className="mt-2 text-center text-slate-500">
           {email}
         </p>
 
         <div className="mt-6">
-
           <OTPInput
             onComplete={(code) => setOtp(code)}
           />
-
         </div>
 
         <form
@@ -79,6 +85,7 @@ const ResetPassword = () => {
         >
           <AuthInput
             label="New Password"
+            name="password"
             type="password"
             value={password}
             onChange={(e) =>
@@ -93,6 +100,7 @@ const ResetPassword = () => {
 
           <AuthInput
             label="Confirm Password"
+            name="confirmPassword"
             type="password"
             value={confirmPassword}
             onChange={(e) =>
@@ -102,7 +110,7 @@ const ResetPassword = () => {
           />
 
           {error && (
-            <div className="my-4 rounded-xl bg-red-50 p-3 text-red-600">
+            <div className="my-4 rounded-xl border border-red-200 bg-red-50 p-3 text-red-600">
               {error}
             </div>
           )}
@@ -111,9 +119,7 @@ const ResetPassword = () => {
             Reset Password
           </AuthButton>
         </form>
-
       </div>
-
     </div>
   );
 };

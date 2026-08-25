@@ -1,12 +1,13 @@
 from datetime import datetime
 
-from sqlalchemy import Column
-from sqlalchemy import DateTime
-from sqlalchemy import Float
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import String
-
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+)
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -18,36 +19,50 @@ class Expense(Base):
     id = Column(
         Integer,
         primary_key=True,
-        index=True,
+        index=True
     )
 
     user_id = Column(
         Integer,
         ForeignKey("users.id"),
         nullable=False,
+        index=True
+    )
+
+    bank_account_id = Column(
+        Integer,
+        ForeignKey("bank_accounts.id"),
+        nullable=False,
+        index=True
     )
 
     category = Column(
         String,
-        nullable=False,
+        nullable=False
     )
 
     amount = Column(
         Float,
-        nullable=False,
+        nullable=False
     )
 
     description = Column(
         String,
-        default="",
+        nullable=True
     )
 
-    date  = Column(
+    date = Column(
         DateTime,
         default=datetime.utcnow,
+        nullable=False
     )
 
     owner = relationship(
         "User",
-        back_populates="expenses",
+        back_populates="expenses"
+    )
+
+    bank_account = relationship(
+        "BankAccount",
+        back_populates="expenses"
     )

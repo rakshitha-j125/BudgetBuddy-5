@@ -1,27 +1,29 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker
 
-from app.config import settings
+from app.config import DATABASE_URL
 
-DATABASE_URL = settings.DATABASE_URL
 
-connect_args = (
-    {"check_same_thread": False}
-    if "sqlite" in DATABASE_URL
-    else {}
-)
+connect_args = {}
+
+if DATABASE_URL.startswith("sqlite"):
+    connect_args = {
+        "check_same_thread": False
+    }
+
 
 engine = create_engine(
     DATABASE_URL,
     connect_args=connect_args
 )
 
+
 SessionLocal = sessionmaker(
     autocommit=False,
     autoflush=False,
-    bind=engine,
+    bind=engine
 )
+
 
 Base = declarative_base()
 
@@ -31,6 +33,5 @@ def get_db():
 
     try:
         yield db
-
     finally:
         db.close()

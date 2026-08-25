@@ -3,7 +3,7 @@ import {
   XCircle,
 } from "lucide-react";
 
-const PasswordStrength = ({ password }) => {
+const PasswordStrength = ({ password = "" }) => {
   const rules = {
     length: password.length >= 8,
     uppercase: /[A-Z]/.test(password),
@@ -15,21 +15,23 @@ const PasswordStrength = ({ password }) => {
   const score = Object.values(rules).filter(Boolean).length;
 
   const getStrength = () => {
-    if (score <= 2)
+    if (score <= 2) {
       return {
         label: "Weak",
         color: "bg-red-500",
         width: "w-1/3",
         text: "text-red-500",
       };
+    }
 
-    if (score <= 4)
+    if (score <= 4) {
       return {
         label: "Medium",
         color: "bg-yellow-500",
         width: "w-2/3",
         text: "text-yellow-500",
       };
+    }
 
     return {
       label: "Strong",
@@ -42,8 +44,7 @@ const PasswordStrength = ({ password }) => {
   const strength = getStrength();
 
   return (
-    <div className="mt-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-
+    <div className="mt-4">
       <div className="mb-2 flex items-center justify-between">
         <span className="font-semibold text-slate-700">
           Password Strength
@@ -55,17 +56,13 @@ const PasswordStrength = ({ password }) => {
       </div>
 
       {/* Progress Bar */}
-
       <div className="mb-4 h-2 w-full rounded-full bg-slate-200">
-
         <div
           className={`h-2 rounded-full transition-all duration-500 ${strength.color} ${strength.width}`}
-        ></div>
-
+        />
       </div>
 
       <div className="space-y-2">
-
         <Rule
           ok={rules.length}
           text="Minimum 8 characters"
@@ -90,9 +87,7 @@ const PasswordStrength = ({ password }) => {
           ok={rules.special}
           text="One special character"
         />
-
       </div>
-
     </div>
   );
 };
@@ -100,7 +95,6 @@ const PasswordStrength = ({ password }) => {
 const Rule = ({ ok, text }) => {
   return (
     <div className="flex items-center gap-2">
-
       {ok ? (
         <CheckCircle2
           size={18}
@@ -122,7 +116,6 @@ const Rule = ({ ok, text }) => {
       >
         {text}
       </span>
-
     </div>
   );
 };

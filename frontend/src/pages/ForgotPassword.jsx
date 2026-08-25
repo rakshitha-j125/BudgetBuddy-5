@@ -1,33 +1,35 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, ArrowLeft } from "lucide-react";
+import { ArrowLeft, Mail } from "lucide-react";
 
-import AuthInput from "../components/auth/AuthInput";
-import AuthButton from "../components/auth/AuthButton";
 import api from "../api/axios";
+
+import AuthButton from "../components/auth/AuthButton";
+import AuthInput from "../components/auth/AuthInput";
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
-
   const [loading, setLoading] = useState(false);
-
   const [error, setError] = useState("");
-
   const [success, setSuccess] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!email.trim()) {
+      setError("Please enter your email.");
+      return;
+    }
 
     setLoading(true);
     setError("");
     setSuccess("");
 
     try {
-      // Backend later
       await api.post("/auth/forgot-password", {
-        email,
+        email: email.trim(),
       });
 
       setSuccess(
@@ -36,7 +38,7 @@ const ForgotPassword = () => {
 
       navigate("/reset-password", {
         state: {
-          email,
+          email: email.trim(),
         },
       });
     } catch (err) {
@@ -50,13 +52,12 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 flex items-center justify-center p-6">
-
+    <div className="flex min-h-screen items-center justify-center bg-slate-100 p-6">
       <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl">
-
         <button
+          type="button"
           onClick={() => navigate("/login")}
-          className="mb-5 flex items-center gap-2 text-slate-500 hover:text-indigo-600"
+          className="mb-5 flex items-center gap-2 text-slate-500 transition hover:text-indigo-600"
         >
           <ArrowLeft size={18} />
           Back to Login

@@ -1,146 +1,141 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+
 import api from "../api/axios";
 
-const AuthContext = createContext();
+export const AuthContext = createContext(null);
 
-export const AuthProvider = ({ children }) => {
-  const navigate = useNavigate();
-
-  const [user, setUser] = useState(null);
-
+export function AuthProvider({ children }) {
   const [token, setToken] = useState(
-    localStorage.getItem("token") || null
+    () => localStorage.getItem("token")
   );
+
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("user");
+
+    try {
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      localStorage.removeItem("user");
+      return null;
+    }
+  });
 
   const [loading, setLoading] = useState(true);
 
-  // ===========================
-  // Load Logged-in User
-  // ===========================
-
   useEffect(() => {
-    const loadUser = async () => {
+    const verifySession = async () => {
       if (!token) {
+        setUser(null);
         setLoading(false);
         return;
       }
 
       try {
-        const res = await api.get("/auth/me");
+        const response = await api.get("/auth/me");
 
-        setUser(res.data);
+        setUser(response.data);
+
+        localStorage.setItem(
+          "user",
+          JSON.stringify(response.data)
+        );
       } catch (error) {
-        console.error(error);
+        console.error("Session verification failed:", error);
 
-        logout();
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+
+        setToken(null);
+        setUser(null);
       } finally {
         setLoading(false);
       }
     };
 
-    loadUser();
-  }, []);
-
-  // ===========================
-  // Signup
-  // ===========================
-
-  const signup = async (userData) => {
-    try {
-      const res = await api.post("/auth/signup", userData);
-
-      return {
-        success: true,
-        data: res.data,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message:
-          error.response?.data?.detail ||
-          "Signup Failed",
-      };
-    }
-  };
-
-  // ===========================
-  // Login
-  // ===========================
+    verifySession();
+  }, [token]);
 
   const login = async (email, password) => {
-    try {
-      const formData = new URLSearchParams();
+    const formData = new URLSearchParams();
 
-      formData.append("username", email);
-      formData.append("password", password);
+    formData.append("username", email);
+    formData.append("password", password);
 
-      const res = await api.post(
-        "/auth/login",
-        formData,
-        {
-          headers: {
-            "Content-Type":
-              "application/x-www-form-urlencoded",
-          },
-        }
-      );
+    const response = await api.post(
+      "/auth/login",
+      formData,
+      {
+        headers: {
+          "Content-Type":
+            "application/x-www-form-urlencoded",
+        },
+      }
+    );
 
-      const accessToken = res.data.access_token;
+    const newToken = response.data.access_token;
 
-      localStorage.setItem("token", accessToken);
+    localStorage.setItem("token", newToken);
+    setToken(newToken);
 
-      setToken(accessToken);
+    const userResponse = await api.get("/auth/me");
 
-      const userRes = await api.get("/auth/me");
+    localStorage.setItem(
+      "user",
+      JSON.stringify(userResponse.data)
+    );
 
-      setUser(userRes.data);
+    setUser(userResponse.data);
 
-      navigate("/dashboard");
-
-      return {
-        success: true,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message:
-          error.response?.data?.detail ||
-          "Invalid Credentials",
-      };
-    }
+    return userResponse.data;
   };
 
-  // ===========================
-  // Logout
-  // ===========================
+  const signup = async (
+    email,
+    password,
+    fullName
+  ) => {
+    const response = await api.post(
+      "/auth/signup",
+      {
+        email,
+        password,
+        full_name: fullName,
+      }
+    );
+
+    return response.data;
+  };
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
 
     setToken(null);
-
     setUser(null);
+  };
 
-    navigate("/login");
+  const value = {
+    user,
+    token,
+    loading,
+    isAuthenticated: Boolean(token),
+    login,
+    signup,
+    logout,
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token,
-        loading,
-        signup,
-        login,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => useContext(AuthContext);
-
-export default AuthContext;
+export function useAuth() {
+  return useContext(AuthContext);
+}

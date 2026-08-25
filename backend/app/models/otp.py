@@ -43,6 +43,7 @@ class OTP(Base):
     is_used = Column(
         Boolean,
         default=False,
+        nullable=False,
     )
 
     expires_at = Column(
@@ -53,6 +54,7 @@ class OTP(Base):
     created_at = Column(
         DateTime,
         default=datetime.utcnow,
+        nullable=False,
     )
 
     owner = relationship(

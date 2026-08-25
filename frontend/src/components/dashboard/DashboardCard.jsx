@@ -1,56 +1,62 @@
-import { ArrowUpRight, ArrowDownRight } from "lucide-react";
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+} from "lucide-react";
 
 export default function DashboardCard({
   title,
   amount,
   icon: Icon,
-  color,
-  change,
-  positive,
+  color = "bg-indigo-600",
+  change = "",
+  positive = true,
 }) {
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-purple-500 hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300">
-
-      <div className="flex justify-between items-center">
-
+    <div className="rounded-2xl bg-slate-900 p-6 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
+      <div className="flex items-center justify-between">
         <div>
-
-          <p className="text-slate-400 text-sm">
+          <p className="text-sm text-slate-400">
             {title}
           </p>
 
-          <h2 className="text-3xl font-bold text-white mt-2">
+          <h2 className="mt-2 text-3xl font-bold text-white">
             {amount}
           </h2>
-
         </div>
 
         <div
-          className={`w-14 h-14 rounded-xl ${color} flex items-center justify-center`}
+          className={`flex h-14 w-14 items-center justify-center rounded-xl ${color}`}
         >
-          <Icon className="text-white" size={28} />
+          <Icon
+            className="text-white"
+            size={28}
+          />
         </div>
-
       </div>
 
-      <div className="flex items-center gap-2 mt-6">
-
+      <div className="mt-6 flex items-center gap-2">
         {positive ? (
-          <ArrowUpRight className="text-green-400" size={18} />
+          <ArrowUpRight
+            className="text-green-400"
+            size={18}
+          />
         ) : (
-          <ArrowDownRight className="text-red-400" size={18} />
+          <ArrowDownRight
+            className="text-red-400"
+            size={18}
+          />
         )}
 
         <span
           className={`font-medium ${
-            positive ? "text-green-400" : "text-red-400"
+            positive
+              ? "text-green-400"
+              : "text-red-400"
           }`}
         >
           {change}
         </span>
-
       </div>
-
     </div>
   );
 }

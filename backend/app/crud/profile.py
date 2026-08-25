@@ -28,6 +28,9 @@ def update_profile(
     if profile_data.currency is not None:
         profile.currency = profile_data.currency
 
+    if profile_data.financial_goal is not None:
+        profile.financial_goal = profile_data.financial_goal
+
     db.commit()
     db.refresh(profile)
 

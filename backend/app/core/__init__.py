@@ -1,2 +1,1 @@
-from .security import *
-from .deps import *
+# BudgetBuddy core package

@@ -1,47 +1,56 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.database import Base
-from app.database import engine
-from app.routers import profile
+from app.database import Base, engine
+
+from app.models import (
+    User,
+    Profile,
+    Expense,
+    Income,
+    Budget,
+    Notification,
+    SavingsGoal,
+    OTP,
+    BankAccount,
+)
 
 from app.routers import (
     auth,
-    income,
     expense,
+    income,
     budget,
+    profile,
+    savings_goals,
+    notification,
     analytics,
     reports,
+    bank_accounts,
 )
 
-# Create all database tables
+
 Base.metadata.create_all(bind=engine)
+
 
 app = FastAPI(
     title="BudgetBuddy API",
+    description="Personal finance management API",
     version="1.0.0",
-    description="Personal Finance Management Backend",
 )
 
-# CORS
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
+        "http://127.0.0.1:5173",
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Root Route
-@app.get("/")
-def root():
-    return {
-        "message": "Welcome to BudgetBuddy API 🚀"
-    }
 
-# Routers
 app.include_router(
     auth.router,
     prefix="/auth",
@@ -49,21 +58,39 @@ app.include_router(
 )
 
 app.include_router(
+    expense.router,
+    prefix="/expenses",
+    tags=["Expenses"],
+)
+
+app.include_router(
     income.router,
-    prefix="/income",
+    prefix="/incomes",
     tags=["Income"],
 )
 
 app.include_router(
-    expense.router,
-    prefix="/expense",
-    tags=["Expense"],
+    budget.router,
+    prefix="/budgets",
+    tags=["Budgets"],
 )
 
 app.include_router(
-    budget.router,
-    prefix="/budget",
-    tags=["Budget"],
+    profile.router,
+    prefix="/profile",
+    tags=["Profile"],
+)
+
+app.include_router(
+    savings_goals.router,
+    prefix="/savings-goals",
+    tags=["Savings Goals"],
+)
+
+app.include_router(
+    notification.router,
+    prefix="/notifications",
+    tags=["Notifications"],
 )
 
 app.include_router(
@@ -77,8 +104,25 @@ app.include_router(
     prefix="/reports",
     tags=["Reports"],
 )
+
 app.include_router(
-    profile.router,
-    prefix="/profile",
-    tags=["Profile"],
+    bank_accounts.router,
+    prefix="/bank-accounts",
+    tags=["Bank Accounts"],
 )
+
+
+@app.get("/")
+def root():
+    return {
+        "message": "BudgetBuddy API running",
+        "version": "1.0.0",
+        "docs": "/docs",
+    }
+
+
+@app.get("/health")
+def health_check():
+    return {
+        "status": "healthy",
+    }

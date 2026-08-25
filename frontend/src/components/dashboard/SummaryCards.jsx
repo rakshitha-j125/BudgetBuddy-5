@@ -1,8 +1,8 @@
 import {
-  Wallet,
   ArrowDownCircle,
   ArrowUpCircle,
   PiggyBank,
+  Wallet,
 } from "lucide-react";
 
 const cards = [
@@ -41,21 +41,21 @@ const SummaryCards = () => {
         return (
           <div
             key={card.title}
-            className="rounded-2xl bg-white p-6 shadow"
+            className="rounded-2xl bg-white p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
           >
-            <div className="flex justify-between">
+            <div className="flex items-center justify-between">
               <div>
                 <p className="text-slate-500">
                   {card.title}
                 </p>
 
-                <h2 className="mt-3 text-3xl font-bold">
+                <h2 className="mt-3 text-3xl font-bold text-slate-800">
                   {card.amount}
                 </h2>
               </div>
 
               <div
-                className={`${card.color} rounded-xl p-3 text-white h-fit`}
+                className={`${card.color} rounded-xl p-3 text-white`}
               >
                 <Icon size={28} />
               </div>

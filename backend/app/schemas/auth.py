@@ -1,27 +1,54 @@
-from typing import Optional
-
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field
 
 
-class Token(BaseModel):
+# =========================
+# LOGIN
+# =========================
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class AuthResponse(BaseModel):
     access_token: str
     token_type: str
+    user: dict
 
 
-class TokenData(BaseModel):
-    email: Optional[str] = None
+# =========================
+# FORGOT PASSWORD
+# =========================
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
 
 
-class OTPRequest(BaseModel):
-    email: str
+# =========================
+# VERIFY OTP
+# =========================
+
+class VerifyOTPRequest(BaseModel):
+    email: EmailStr
+    otp: str = Field(
+        ...,
+        min_length=6,
+        max_length=6
+    )
 
 
-class OTPVerify(BaseModel):
-    email: str
-    otp: str
+# =========================
+# RESET PASSWORD
+# =========================
 
-
-class ResetPassword(BaseModel):
-    email: str
-    otp: str
-    password: str
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    otp: str = Field(
+        ...,
+        min_length=6,
+        max_length=6
+    )
+    password: str = Field(
+        ...,
+        min_length=6
+    )

@@ -1,10 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 
 const OTP_LENGTH = 6;
+const RESEND_TIME = 60;
 
-const OTPInput = ({ onComplete }) => {
-  const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(""));
-  const [timer, setTimer] = useState(60);
+const OTPInput = ({
+  onComplete,
+  onResend,
+}) => {
+  const [otp, setOtp] = useState(
+    Array(OTP_LENGTH).fill("")
+  );
+
+  const [timer, setTimer] = useState(RESEND_TIME);
 
   const inputRefs = useRef([]);
 
@@ -23,7 +30,7 @@ const OTPInput = ({ onComplete }) => {
   useEffect(() => {
     const code = otp.join("");
 
-    if (code.length === OTP_LENGTH) {
+    if (code.length === OTP_LENGTH && !code.includes("")) {
       onComplete?.(code);
     }
   }, [otp, onComplete]);
@@ -33,7 +40,6 @@ const OTPInput = ({ onComplete }) => {
     if (!/^\d?$/.test(value)) return;
 
     const newOtp = [...otp];
-
     newOtp[index] = value;
 
     setOtp(newOtp);
@@ -45,6 +51,16 @@ const OTPInput = ({ onComplete }) => {
 
   // Handle Backspace
   const handleKeyDown = (e, index) => {
+    if (
+      e.key === "Backspace" &&
+      otp[index]
+    ) {
+      const newOtp = [...otp];
+      newOtp[index] = "";
+      setOtp(newOtp);
+      return;
+    }
+
     if (
       e.key === "Backspace" &&
       !otp[index] &&
@@ -60,45 +76,49 @@ const OTPInput = ({ onComplete }) => {
 
     const pasted = e.clipboardData
       .getData("text")
-      .trim()
+      .replace(/\D/g, "")
       .slice(0, OTP_LENGTH);
 
-    if (!/^\d+$/.test(pasted)) return;
+    if (!pasted) return;
 
-    const newOtp = pasted.split("");
+    const newOtp = Array(OTP_LENGTH).fill("");
 
-    while (newOtp.length < OTP_LENGTH) {
-      newOtp.push("");
-    }
+    pasted.split("").forEach((digit, index) => {
+      newOtp[index] = digit;
+    });
 
     setOtp(newOtp);
 
-    const nextIndex =
-      Math.min(pasted.length, OTP_LENGTH - 1);
+    const focusIndex = Math.min(
+      pasted.length,
+      OTP_LENGTH - 1
+    );
 
-    inputRefs.current[nextIndex]?.focus();
+    inputRefs.current[focusIndex]?.focus();
   };
 
   // Resend OTP
   const handleResend = () => {
     setOtp(Array(OTP_LENGTH).fill(""));
-    setTimer(60);
+    setTimer(RESEND_TIME);
+
     inputRefs.current[0]?.focus();
 
-    console.log("Resend OTP");
+    if (onResend) {
+      onResend();
+    }
   };
 
   return (
-    <div className="w-full">
-
+    <div>
       <div className="flex justify-center gap-3">
-
         {otp.map((digit, index) => (
           <input
             key={index}
             ref={(el) => (inputRefs.current[index] = el)}
             type="text"
             inputMode="numeric"
+            autoComplete="one-time-code"
             maxLength={1}
             value={digit}
             onChange={(e) =>
@@ -126,11 +146,9 @@ const OTPInput = ({ onComplete }) => {
             "
           />
         ))}
-
       </div>
 
       <div className="mt-6 text-center">
-
         {timer > 0 ? (
           <p className="text-slate-500">
             Resend OTP in{" "}
@@ -140,19 +158,19 @@ const OTPInput = ({ onComplete }) => {
           </p>
         ) : (
           <button
+            type="button"
             onClick={handleResend}
             className="
               font-semibold
               text-indigo-600
+              transition
               hover:text-indigo-700
             "
           >
             Resend OTP
           </button>
         )}
-
       </div>
-
     </div>
   );
 };

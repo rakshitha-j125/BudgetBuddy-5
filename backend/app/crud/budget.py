@@ -1,69 +1,110 @@
 from sqlalchemy.orm import Session
 
 from app.models.budget import Budget
-
-
-def get_budget(
-    db: Session,
-    budget_id: int,
-    user_id: int,
-):
-    return (
-        db.query(Budget)
-        .filter(
-            Budget.id == budget_id,
-            Budget.user_id == user_id,
-        )
-        .first()
-    )
-
-
-def get_all_budgets(
-    db: Session,
-    user_id: int,
-):
-    return (
-        db.query(Budget)
-        .filter(Budget.user_id == user_id)
-        .all()
-    )
+from app.schemas.budget import (
+    BudgetCreate,
+    BudgetUpdate,
+)
 
 
 def create_budget(
     db: Session,
     user_id: int,
-    budget,
+    budget_in: BudgetCreate
 ):
-    obj = Budget(
+
+    data = budget_in.model_dump()
+
+    budget = Budget(
         user_id=user_id,
-        category=budget.category,
-        monthly_limit=budget.monthly_limit,
+        **data
     )
 
-    db.add(obj)
+    db.add(budget)
     db.commit()
-    db.refresh(obj)
+    db.refresh(budget)
 
-    return obj
+    return budget
+
+
+def get_budgets_by_user(
+    db: Session,
+    user_id: int
+):
+
+    return (
+        db.query(Budget)
+        .filter(Budget.user_id == user_id)
+        .order_by(Budget.month_year.desc())
+        .all()
+    )
+
+
+def get_budget(
+    db: Session,
+    budget_id: int,
+    user_id: int
+):
+
+    return (
+        db.query(Budget)
+        .filter(
+            Budget.id == budget_id,
+            Budget.user_id == user_id
+        )
+        .first()
+    )
 
 
 def update_budget(
     db: Session,
-    budget_obj: Budget,
-    budget,
+    budget_id: int,
+    user_id: int,
+    budget_in: BudgetUpdate
 ):
-    budget_obj.category = budget.category
-    budget_obj.monthly_limit = budget.monthly_limit
+
+    budget = get_budget(
+        db,
+        budget_id,
+        user_id
+    )
+
+    if not budget:
+        return None
+
+    data = budget_in.model_dump(
+        exclude_unset=True
+    )
+
+    for key, value in data.items():
+        setattr(
+            budget,
+            key,
+            value
+        )
 
     db.commit()
-    db.refresh(budget_obj)
+    db.refresh(budget)
 
-    return budget_obj
+    return budget
 
 
 def delete_budget(
     db: Session,
-    budget_obj: Budget,
+    budget_id: int,
+    user_id: int
 ):
-    db.delete(budget_obj)
+
+    budget = get_budget(
+        db,
+        budget_id,
+        user_id
+    )
+
+    if not budget:
+        return None
+
+    db.delete(budget)
     db.commit()
+
+    return budget

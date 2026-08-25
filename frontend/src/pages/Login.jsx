@@ -1,132 +1,94 @@
-import { Link } from "react-router-dom";
-import { Wallet, ShieldCheck, TrendingUp } from "lucide-react";
-
 import LoginForm from "../components/auth/LoginForm";
 
-const Login = () => {
+export default function Login() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900">
-
-      <div className="mx-auto flex min-h-screen max-w-7xl items-center justify-center px-6 py-10">
-
-        <div className="grid w-full overflow-hidden rounded-3xl bg-white shadow-2xl lg:grid-cols-2">
-
-          {/* Left Section */}
-
-          <div className="hidden flex-col justify-between bg-gradient-to-br from-indigo-700 via-blue-700 to-cyan-600 p-12 text-white lg:flex">
-
-            <div>
-
-              <div className="flex items-center gap-3">
-
-                <div className="rounded-xl bg-white/20 p-3">
-
-                  <Wallet size={34} />
-
-                </div>
-
-                <div>
-
-                  <h1 className="text-3xl font-bold">
-                    BudgetBuddy
-                  </h1>
-
-                  <p className="text-blue-100">
-                    Smart Personal Finance
-                  </p>
-
-                </div>
-
+    <div className="min-h-screen bg-slate-50">
+      <div className="grid min-h-screen lg:grid-cols-2">
+        <div className="relative hidden overflow-hidden bg-[#080d2b] lg:flex">
+          <div className="relative z-10 flex w-full flex-col justify-between p-12 xl:p-16">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg">
+                💳
               </div>
 
-              <h2 className="mt-12 text-5xl font-bold leading-tight">
+              <span className="text-xl font-bold text-white">
+                BudgetBuddy
+              </span>
+            </div>
 
-                Manage your
-
-                <br />
-
-                money with
-
-                <br />
-
-                confidence.
-
-              </h2>
-
-              <p className="mt-6 text-lg text-blue-100">
-
-                Track income, monitor expenses,
-
-                build budgets and gain insights
-
-                into your financial future.
-
+            <div className="max-w-xl">
+              <p className="mb-5 text-sm font-semibold uppercase tracking-wide text-blue-400">
+                Smarter Money Management
               </p>
 
+              <h1 className="text-5xl font-bold leading-tight text-white xl:text-6xl">
+                Take control of your
+                <br />
+                money.
+              </h1>
+
+              <p className="mt-7 max-w-lg text-lg leading-8 text-slate-400">
+                Track your income, manage expenses, plan budgets and
+                understand your spending — all in one place.
+              </p>
+
+              <div className="mt-10 space-y-6">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 text-white">
+                    📊
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-white">
+                      Clear financial insights
+                    </p>
+
+                    <p className="text-sm text-slate-400">
+                      Understand where your money goes.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 text-white">
+                    🛡️
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-white">
+                      Secure by design
+                    </p>
+
+                    <p className="text-sm text-slate-400">
+                      Your financial data belongs to you.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-5">
-
-              <Feature
-                icon={ShieldCheck}
-                title="Secure Authentication"
-                desc="Protected with JWT authentication."
-              />
-
-              <Feature
-                icon={TrendingUp}
-                title="Financial Analytics"
-                desc="Visualize your spending habits."
-              />
-
-            </div>
-
+            <p className="text-sm text-slate-500">
+              © 2026 BudgetBuddy
+            </p>
           </div>
-
-          {/* Right Section */}
-
-          <div className="flex items-center justify-center bg-slate-50 p-8 lg:p-14">
-
-            <LoginForm />
-
-          </div>
-
         </div>
 
-      </div>
+        <div className="flex min-h-screen items-center justify-center px-6 py-12">
+          <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-slate-900">
+                Welcome back
+              </h2>
 
+              <p className="mt-2 text-sm text-slate-500">
+                Sign in to continue to your dashboard.
+              </p>
+            </div>
+
+            <LoginForm />
+          </div>
+        </div>
+      </div>
     </div>
   );
-};
-
-const Feature = ({ icon: Icon, title, desc }) => {
-  return (
-    <div className="flex items-start gap-4 rounded-xl bg-white/10 p-4">
-
-      <div className="rounded-lg bg-white/20 p-3">
-
-        <Icon size={24} />
-
-      </div>
-
-      <div>
-
-        <h3 className="font-semibold">
-
-          {title}
-
-        </h3>
-
-        <p className="text-sm text-blue-100">
-
-          {desc}
-
-        </p>
-
-      </div>
-
-    </div>
-  );
-};
-
-export default Login;
+}

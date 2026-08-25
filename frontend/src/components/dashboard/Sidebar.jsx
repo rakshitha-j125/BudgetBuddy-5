@@ -1,14 +1,14 @@
 import { NavLink } from "react-router-dom";
 
 import {
-  LayoutDashboard,
-  Wallet,
   ArrowDownCircle,
   ArrowUpCircle,
-  PieChart,
   FileText,
-  User,
+  LayoutDashboard,
+  PieChart,
   Settings,
+  User,
+  Wallet,
 } from "lucide-react";
 
 const menu = [
@@ -56,8 +56,7 @@ const menu = [
 
 const Sidebar = () => {
   return (
-    <aside className="hidden lg:flex lg:flex-col w-72 bg-slate-900 text-white">
-
+    <aside className="flex h-screen w-72 flex-col bg-slate-900 text-white shadow-xl">
       {/* Logo */}
       <div className="border-b border-slate-800 p-6">
         <h1 className="text-3xl font-bold">
@@ -71,7 +70,6 @@ const Sidebar = () => {
 
       {/* Navigation */}
       <nav className="flex-1 px-4 py-6">
-
         {menu.map((item) => {
           const Icon = item.icon;
 
@@ -92,9 +90,7 @@ const Sidebar = () => {
             </NavLink>
           );
         })}
-
       </nav>
-
     </aside>
   );
 };

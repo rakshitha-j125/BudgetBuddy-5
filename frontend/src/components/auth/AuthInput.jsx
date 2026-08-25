@@ -21,21 +21,24 @@ const AuthInput = ({
       : type;
 
   return (
-    <div className="w-full mb-5">
+    <div className="mb-5">
       {/* Label */}
-      <label className="mb-2 block text-sm font-semibold text-slate-700">
-        {label}
-      </label>
+      {label && (
+        <label
+          htmlFor={name}
+          className="mb-2 block text-sm font-medium text-slate-700"
+        >
+          {label}
+        </label>
+      )}
 
       {/* Input Box */}
       <div
-        className={`flex items-center rounded-xl border bg-white px-4 py-3 transition-all duration-200
-        ${
+        className={`flex items-center rounded-xl border bg-white px-4 py-3 transition-all duration-200 ${
           error
-            ? "border-red-500"
-            : "border-slate-300 focus-within:border-indigo-600"
-        }
-        focus-within:ring-2 focus-within:ring-indigo-200`}
+            ? "border-red-500 ring-2 ring-red-100"
+            : "border-slate-300 focus-within:border-indigo-600 focus-within:ring-2 focus-within:ring-indigo-200"
+        }`}
       >
         {/* Left Icon */}
         {Icon && (
@@ -47,22 +50,27 @@ const AuthInput = ({
 
         {/* Input */}
         <input
+          id={name}
           type={inputType}
           name={name}
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className="w-full bg-transparent outline-none text-slate-700 placeholder:text-slate-400"
+          autoComplete={type === "password" ? "current-password" : "off"}
+          className="w-full bg-transparent text-slate-700 placeholder:text-slate-400 outline-none"
         />
 
         {/* Password Toggle */}
         {type === "password" && (
           <button
             type="button"
-            onClick={() =>
-              setShowPassword(!showPassword)
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="ml-2 text-slate-500 transition hover:text-indigo-600"
+            aria-label={
+              showPassword
+                ? "Hide password"
+                : "Show password"
             }
-            className="text-slate-500 hover:text-indigo-600"
           >
             {showPassword ? (
               <EyeOff size={20} />
