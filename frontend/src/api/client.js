@@ -4,6 +4,10 @@ const getToken = () => {
   return localStorage.getItem("token") || "";
 };
 
+// =========================================================
+// GENERIC REQUEST
+// =========================================================
+
 const request = async (endpoint, options = {}) => {
   const token = getToken();
 
@@ -54,6 +58,10 @@ const request = async (endpoint, options = {}) => {
     status: response.status,
   };
 };
+
+// =========================================================
+// AUTH
+// =========================================================
 
 export const signup = async (payload) => {
   return request("/auth/signup", {
@@ -115,6 +123,10 @@ export const getCurrentUser = async () => {
   return request("/auth/me");
 };
 
+// =========================================================
+// EXPENSES
+// =========================================================
+
 export const getExpenses = async () => {
   return request("/expenses/");
 };
@@ -154,6 +166,10 @@ export const getDashboard = async () => {
   return request("/expenses/dashboard");
 };
 
+// =========================================================
+// INCOME
+// =========================================================
+
 export const getIncomes = async () => {
   return request("/incomes/");
 };
@@ -184,6 +200,10 @@ export const deleteIncome = async (incomeId) => {
     method: "DELETE",
   });
 };
+
+// =========================================================
+// BANK ACCOUNTS
+// =========================================================
 
 export const getBankAccounts = async () => {
   return request("/bank-accounts/");
@@ -222,6 +242,10 @@ export const deleteBankAccount = async (
   });
 };
 
+// =========================================================
+// BUDGETS
+// =========================================================
+
 export const getBudgets = async () => {
   return request("/budgets/");
 };
@@ -253,9 +277,17 @@ export const deleteBudget = async (budgetId) => {
   });
 };
 
+// =========================================================
+// REPORTS
+// =========================================================
+
 export const getReports = async () => {
   return request("/reports/");
 };
+
+// =========================================================
+// CSV EXPORT
+// =========================================================
 
 export const exportReportsCSV = async () => {
   const token = getToken();
@@ -268,6 +300,60 @@ export const exportReportsCSV = async () => {
 
   const response = await fetch(
     `${API_BASE_URL}/reports/export`,
+    {
+      method: "GET",
+      headers,
+    }
+  );
+
+  if (!response.ok) {
+    const text = await response.text();
+
+    let data = null;
+
+    try {
+      data = text ? JSON.parse(text) : null;
+    } catch {
+      data = text;
+    }
+
+    const error = new Error(
+      data?.detail ||
+        data?.message ||
+        `Request failed: ${response.status}`
+    );
+
+    error.response = {
+      status: response.status,
+      data,
+    };
+
+    throw error;
+  }
+
+  const data = await response.blob();
+
+  return {
+    data,
+    status: response.status,
+  };
+};
+
+// =========================================================
+// PDF EXPORT
+// =========================================================
+
+export const exportReportsPDF = async () => {
+  const token = getToken();
+
+  const headers = {};
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const response = await fetch(
+    `${API_BASE_URL}/reports/export/pdf`,
     {
       method: "GET",
       headers,
