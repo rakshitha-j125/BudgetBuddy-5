@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { Save, UserCircle } from "lucide-react";
+import {
+  Save,
+  UserCircle,
+  Crown,
+  Clock,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
 
 import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
@@ -20,6 +27,11 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  // Premium request state
+  const [premiumRequest, setPremiumRequest] = useState(null);
+  const [premiumLoading, setPremiumLoading] = useState(true);
+  const [requestingPremium, setRequestingPremium] = useState(false);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -45,6 +57,44 @@ const Profile = () => {
 
     loadProfile();
   }, []);
+
+  // Load Premium request status
+  useEffect(() => {
+    const loadPremiumRequest = async () => {
+      try {
+        const response = await api.get("/premium-requests/my");
+        setPremiumRequest(response.data);
+      } catch (err) {
+        console.error("Unable to load premium request:", err);
+      } finally {
+        setPremiumLoading(false);
+      }
+    };
+
+    if (user) {
+      loadPremiumRequest();
+    }
+  }, [user]);
+
+  const handlePremiumRequest = async () => {
+    setRequestingPremium(true);
+    setMessage("");
+    setError("");
+
+    try {
+      const response = await api.post("/premium-requests/");
+
+      setPremiumRequest(response.data);
+      setMessage("Premium request submitted successfully.");
+    } catch (err) {
+      setError(
+        err.response?.data?.detail ||
+          "Unable to submit Premium request."
+      );
+    } finally {
+      setRequestingPremium(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -89,6 +139,11 @@ const Profile = () => {
     user?.email ||
     "User";
 
+  const isStudent = user?.role === "student";
+  const isPremium =
+    user?.role === "premium" ||
+    user?.role === "admin";
+
   return (
     <div className="min-h-screen bg-slate-50">
       <Sidebar />
@@ -130,8 +185,88 @@ const Profile = () => {
                   <p className="mt-1 text-slate-500">
                     {user?.email || "Email not available"}
                   </p>
+
+                  <p className="mt-2 text-sm font-semibold capitalize text-indigo-600">
+                    {user?.role || "student"} account
+                  </p>
                 </div>
               </div>
+
+              {/* PREMIUM SECTION */}
+              {!premiumLoading && (
+                <div className="mt-8 rounded-2xl border border-indigo-100 bg-indigo-50 p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white">
+                      <Crown size={24} />
+                    </div>
+
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-slate-900">
+                        Premium Access
+                      </h3>
+
+                      {isPremium ? (
+                        <div className="mt-3 flex items-center gap-2 text-green-700">
+                          <CheckCircle size={20} />
+                          <span className="font-semibold">
+                            You have Premium access.
+                          </span>
+                        </div>
+                      ) : isStudent &&
+                        premiumRequest?.status === "pending" ? (
+                        <div className="mt-3 flex items-center gap-2 text-amber-700">
+                          <Clock size={20} />
+                          <span className="font-semibold">
+                            Premium request is pending admin approval.
+                          </span>
+                        </div>
+                      ) : isStudent &&
+                        premiumRequest?.status === "rejected" ? (
+                        <>
+                          <div className="mt-3 flex items-center gap-2 text-red-700">
+                            <XCircle size={20} />
+                            <span className="font-semibold">
+                              Your Premium request was rejected.
+                            </span>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={handlePremiumRequest}
+                            disabled={requestingPremium}
+                            className="mt-4 flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            <Crown size={18} />
+                            {requestingPremium
+                              ? "Requesting..."
+                              : "Request Premium Again"}
+                          </button>
+                        </>
+                      ) : isStudent ? (
+                        <>
+                          <p className="mt-2 text-sm text-slate-600">
+                            Request Premium access to unlock advanced
+                            analytics and other Premium features.
+                          </p>
+
+                          <button
+                            type="button"
+                            onClick={handlePremiumRequest}
+                            disabled={requestingPremium}
+                            className="mt-4 flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            <Crown size={18} />
+
+                            {requestingPremium
+                              ? "Requesting..."
+                              : "Request Premium"}
+                          </button>
+                        </>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {message && (
                 <div className="mt-6 rounded-xl border border-green-200 bg-green-50 p-4 text-green-700">

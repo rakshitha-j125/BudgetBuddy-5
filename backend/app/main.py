@@ -13,6 +13,8 @@ from app.models import (
     SavingsGoal,
     OTP,
     BankAccount,
+    PremiumRequest,
+    SystemLog,
 )
 
 from app.routers import (
@@ -26,11 +28,22 @@ from app.routers import (
     analytics,
     reports,
     bank_accounts,
+    premium_requests,
+    admin,
+    system_logs,
 )
 
 
+# ============================================================
+# CREATE DATABASE TABLES
+# ============================================================
+
 Base.metadata.create_all(bind=engine)
 
+
+# ============================================================
+# FASTAPI APP
+# ============================================================
 
 app = FastAPI(
     title="BudgetBuddy API",
@@ -38,6 +51,10 @@ app = FastAPI(
     version="1.0.0",
 )
 
+
+# ============================================================
+# CORS
+# ============================================================
 
 app.add_middleware(
     CORSMiddleware,
@@ -50,6 +67,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# ============================================================
+# APPLICATION ROUTES
+# ============================================================
 
 app.include_router(
     auth.router,
@@ -111,6 +132,33 @@ app.include_router(
     tags=["Bank Accounts"],
 )
 
+app.include_router(
+    premium_requests.router,
+    prefix="/premium-requests",
+    tags=["Premium Requests"],
+)
+
+
+# ============================================================
+# ADMIN ROUTES
+# ============================================================
+
+app.include_router(
+    admin.router,
+    prefix="/admin",
+    tags=["Admin"],
+)
+
+app.include_router(
+    system_logs.router,
+    prefix="/admin/system-logs",
+    tags=["System Logs"],
+)
+
+
+# ============================================================
+# ROOT
+# ============================================================
 
 @app.get("/")
 def root():
@@ -120,6 +168,10 @@ def root():
         "docs": "/docs",
     }
 
+
+# ============================================================
+# HEALTH CHECK
+# ============================================================
 
 @app.get("/health")
 def health_check():

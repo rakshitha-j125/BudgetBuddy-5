@@ -15,3 +15,8 @@ frontend/dist/
 # IDE
 .vscode/
 .idea/
+venv/
+backend/venv/
+__pycache__/
+*.pyc
+.env

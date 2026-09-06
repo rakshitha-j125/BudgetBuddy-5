@@ -7,6 +7,9 @@ from app.models.notification import Notification
 from app.models.savings_goal import SavingsGoal
 from app.models.otp import OTP
 from app.models.bank_account import BankAccount
+from app.models.premium_request import PremiumRequest
+from app.models.system_log import SystemLog
+
 
 __all__ = [
     "User",
@@ -17,5 +20,7 @@ __all__ = [
     "Notification",
     "SavingsGoal",
     "OTP",
-    "BankAccount"           
+    "BankAccount",
+    "PremiumRequest",
+    "SystemLog",
 ]

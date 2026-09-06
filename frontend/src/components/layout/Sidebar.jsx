@@ -10,6 +10,9 @@ import {
   UserCircle,
   Settings,
   LogOut,
+  Crown,
+  Users,
+  ScrollText,
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -68,11 +71,39 @@ const navigation = [
   },
 ];
 
+const adminNavigation = [
+  {
+    name: "Premium Requests",
+    path: "/admin/premium-requests",
+    icon: Crown,
+  },
+  {
+    name: "System Analytics",
+    path: "/admin/system-analytics",
+    icon: BarChart3,
+  },
+  {
+    name: "User Management",
+    path: "/admin/users",
+    icon: Users,
+  },
+  {
+    name: "System Logs",
+    path: "/admin/system-logs",
+    icon: ScrollText,
+  },
+];
+
 export default function Sidebar() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+
+  const isAdmin = user?.role === "admin";
 
   return (
     <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r border-slate-200 bg-white">
+
+      {/* LOGO */}
+
       <div className="flex h-20 items-center border-b border-slate-200 px-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
@@ -85,7 +116,12 @@ export default function Sidebar() {
         </div>
       </div>
 
+      {/* NAVIGATION */}
+
       <nav className="flex-1 space-y-2 overflow-y-auto px-4 py-6">
+
+        {/* NORMAL NAVIGATION */}
+
         {navigation.map((item) => {
           const Icon = item.icon;
 
@@ -106,7 +142,46 @@ export default function Sidebar() {
             </NavLink>
           );
         })}
+
+        {/* ADMIN SECTION */}
+
+        {isAdmin && (
+          <div className="mt-6 pt-5 border-t border-slate-200">
+
+            <p className="px-4 pb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Admin
+            </p>
+
+            <div className="space-y-2">
+
+              {adminNavigation.map((item) => {
+                const Icon = item.icon;
+
+                return (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition ${
+                        isActive
+                          ? "bg-blue-50 text-blue-600"
+                          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                      }`
+                    }
+                  >
+                    <Icon size={19} />
+                    {item.name}
+                  </NavLink>
+                );
+              })}
+
+            </div>
+          </div>
+        )}
+
       </nav>
+
+      {/* LOGOUT */}
 
       <div className="border-t border-slate-200 p-4">
         <button
@@ -118,6 +193,7 @@ export default function Sidebar() {
           Logout
         </button>
       </div>
+
     </aside>
   );
 }

@@ -83,3 +83,24 @@ def get_premium_user(
         )
 
     return current_user
+
+
+# =========================================================
+# ADMIN USER
+# =========================================================
+
+def get_admin_user(
+    current_user=Depends(get_current_user)
+):
+    """
+    Allows only Admin users to access
+    admin-only features.
+    """
+
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required"
+        )
+
+    return current_user

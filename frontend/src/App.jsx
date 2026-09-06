@@ -14,10 +14,21 @@ import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
 import BankAccounts from "./pages/BankAccounts";
 
+// Admin Pages
+import AdminPremiumRequests from "./pages/AdminPremiumRequests";
+import AdminSystemAnalytics from "./pages/AdminSystemAnalytics";
+import AdminUsers from "./pages/AdminUsers";
+import AdminSystemLogs from "./pages/AdminSystemLogs";
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+
+        {/* =========================
+            PUBLIC ROUTES
+        ========================= */}
+
         <Route
           path="/"
           element={<Navigate to="/login" replace />}
@@ -32,6 +43,10 @@ function App() {
           path="/signup"
           element={<Signup />}
         />
+
+        {/* =========================
+            USER ROUTES
+        ========================= */}
 
         <Route
           path="/dashboard"
@@ -93,10 +108,39 @@ function App() {
           element={<Reports />}
         />
 
+        {/* =========================
+            ADMIN ROUTES
+        ========================= */}
+
+        <Route
+          path="/admin/premium-requests"
+          element={<AdminPremiumRequests />}
+        />
+
+        <Route
+          path="/admin/system-analytics"
+          element={<AdminSystemAnalytics />}
+        />
+
+        <Route
+          path="/admin/users"
+          element={<AdminUsers />}
+        />
+
+        <Route
+          path="/admin/system-logs"
+          element={<AdminSystemLogs />}
+        />
+
+        {/* =========================
+            FALLBACK
+        ========================= */}
+
         <Route
           path="*"
           element={<Navigate to="/dashboard" replace />}
         />
+
       </Routes>
     </BrowserRouter>
   );

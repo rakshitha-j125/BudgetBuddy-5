@@ -114,3 +114,10 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan"
     )
+
+    # Premium access requests
+    premium_requests = relationship(
+        "PremiumRequest",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )

@@ -1110,3 +1110,53 @@ def get_month_comparison(
                 ),
         },
     }
+    
+    # =========================================================
+# 4. SAVINGS CONTRIBUTION TREND
+# =========================================================
+
+@router.get("/savings-trend")
+def get_savings_contribution_trend(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_premium_user
+    ),
+):
+    goals = (
+        db.query(SavingsGoal)
+        .filter(
+            SavingsGoal.user_id == current_user.id
+        )
+        .order_by(
+            SavingsGoal.created_at.asc()
+        )
+        .all()
+    )
+
+    data = {}
+
+    for goal in goals:
+        if not goal.created_at:
+            continue
+
+        month_key = (
+            f"{goal.created_at.year}-"
+            f"{goal.created_at.month:02d}"
+        )
+
+        data.setdefault(
+            month_key,
+            {
+                "month": month_key,
+                "contribution": 0.0,
+            },
+        )
+
+        data[month_key]["contribution"] += float(
+            goal.current_amount or 0
+        )
+
+    return sorted(
+        data.values(),
+        key=lambda item: item["month"],
+    )

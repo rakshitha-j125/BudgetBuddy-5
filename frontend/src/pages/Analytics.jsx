@@ -53,6 +53,7 @@ const Analytics = () => {
   const [dateRange, setDateRange] = useState(null);
   const [categoryOverTime, setCategoryOverTime] = useState([]);
   const [monthComparison, setMonthComparison] = useState(null);
+  const [savingsContributionTrend, setSavingsContributionTrend] = useState([]);
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -71,29 +72,52 @@ const Analytics = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  /*
-   * =======================================================
-   * CHECK USER ROLE
-   * =======================================================
-   */
+/*
+ * =======================================================
+ * CHECK USER ROLE
+ * =======================================================
+ */
 
-  const storedUser = localStorage.getItem("user");
+const [userRole, setUserRole] = useState("student");
 
-  let user = null;
+useEffect(() => {
+  const loadCurrentUser = async () => {
+    try {
+      const response = await api.get("/auth/me");
 
-  try {
-    user = storedUser
-      ? JSON.parse(storedUser)
-      : null;
-  } catch {
-    user = null;
-  }
+      const currentUser = response.data;
 
-  const userRole = user?.role || "student";
+      setUserRole(currentUser?.role || "student");
 
-  const isPremium =
-    userRole === "premium" ||
-    userRole === "admin";
+      // Keep localStorage user data synchronized
+      localStorage.setItem(
+        "user",
+        JSON.stringify(currentUser)
+      );
+    } catch (err) {
+      console.error("Unable to load current user:", err);
+
+      // Fallback to stored user
+      const storedUser = localStorage.getItem("user");
+
+      try {
+        const parsedUser = storedUser
+          ? JSON.parse(storedUser)
+          : null;
+
+        setUserRole(parsedUser?.role || "student");
+      } catch {
+        setUserRole("student");
+      }
+    }
+  };
+
+  loadCurrentUser();
+}, []);
+
+const isPremium =
+  userRole === "premium" ||
+  userRole === "admin";
 
   /*
    * =======================================================
@@ -261,6 +285,48 @@ const Analytics = () => {
       setPremiumError(
         err.response?.data?.detail ||
           "Unable to load category trends."
+      );
+    } finally {
+      setPremiumLoading(false);
+    }
+  };
+
+  /*
+   * =======================================================
+   * PREMIUM - SAVINGS CONTRIBUTION TREND
+   * =======================================================
+   */
+
+  const loadSavingsContributionTrend = async () => {
+    try {
+      setPremiumLoading(true);
+      setPremiumError("");
+
+      const response = await api.get(
+        "/analytics/savings-trend"
+      );
+
+      const rawData = response.data || [];
+
+      const normalizedData = rawData.map((item) => ({
+        month: item.month,
+        contribution: Number(
+          item.contribution ??
+            item.saved ??
+            item.amount ??
+            item.total_saved ??
+            item.current_amount ??
+            0
+        ),
+      }));
+
+      setSavingsContributionTrend(normalizedData);
+    } catch (err) {
+      console.error(err);
+
+      setPremiumError(
+        err.response?.data?.detail ||
+          "Unable to load savings contribution trend."
       );
     } finally {
       setPremiumLoading(false);
@@ -1387,6 +1453,83 @@ const Analytics = () => {
 
                 )}
 
+              </div>
+
+              {/* =========================================
+                  SAVINGS CONTRIBUTION TREND
+              ========================================= */}
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-6">
+
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+                  <div>
+                    <h3 className="font-bold text-slate-900">
+                      Savings Contribution Trend
+                    </h3>
+
+                    <p className="text-sm text-slate-500">
+                      Track how much you contribute to your savings each month.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={loadSavingsContributionTrend}
+                    disabled={premiumLoading}
+                    className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
+                  >
+                    {premiumLoading
+                      ? "Loading..."
+                      : "Load Savings Trend"}
+                  </button>
+                </div>
+
+                {savingsContributionTrend.length > 0 ? (
+                  <div className="mt-6 h-80">
+                    <ResponsiveContainer
+                      width="100%"
+                      height="100%"
+                    >
+                      <LineChart
+                        data={savingsContributionTrend}
+                      >
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                        />
+
+                        <XAxis
+                          dataKey="month"
+                          tickFormatter={formatMonth}
+                        />
+
+                        <YAxis />
+
+                        <Tooltip
+                          labelFormatter={formatMonth}
+                          formatter={(value) =>
+                            formatCurrency(value)
+                          }
+                        />
+
+                        <Legend />
+
+                        <Line
+                          type="monotone"
+                          dataKey="contribution"
+                          name="Savings Contribution"
+                          stroke="#8B5CF6"
+                          strokeWidth={3}
+                          dot={{ r: 4 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div className="flex h-72 items-center justify-center text-sm text-slate-500">
+                    Click "Load Savings Trend" to view your monthly savings contributions.
+                  </div>
+                )}
               </div>
 
               {/* =========================================
