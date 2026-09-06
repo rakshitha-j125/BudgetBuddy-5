@@ -117,6 +117,8 @@ export function AuthProvider({ children }) {
 
     setToken(null);
     setUser(null);
+
+    window.location.href = "/login";
   };
 
   const value = {
