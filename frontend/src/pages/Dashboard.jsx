@@ -3,7 +3,8 @@ import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
 import { useAuth } from "../context/useAuth";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 export default function Dashboard() {
   const { token, user } = useAuth();
